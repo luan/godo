@@ -1,0 +1,9 @@
+<form name="input" action="/tasks" method="post">
+  <input type="text" name="name" autofocus="autofocus"/>
+  <input type="submit" value="save"/>
+</form>
+<ul>
+  {{range .}}
+    <li>{{.Name}}</li>
+  {{end}}
+</ul>
