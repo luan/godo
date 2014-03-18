@@ -20,20 +20,20 @@ var (
 	response *httptest.ResponseRecorder
 )
 
-func Get(m *martini.ClassicMartini, method string, route string) {
-	request, _ := http.NewRequest(method, route, nil)
+func Get(m *martini.ClassicMartini, route string) {
+	request, _ := http.NewRequest("GET", route, nil)
 	response = httptest.NewRecorder()
 	m.ServeHTTP(response, request)
 }
 
-func Post(m *martini.ClassicMartini, method string, route string, params map[string]string) {
+func Post(m *martini.ClassicMartini, route string, params map[string]string) {
 	body := &bytes.Buffer{}
 
 	writer := multipart.NewWriter(body)
 	for k, v := range params {
 		writer.WriteField(k, v)
 	}
-	request, _ := http.NewRequest(method, route, body)
+	request, _ := http.NewRequest("POST", route, body)
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 	writer.Close()
 	response = httptest.NewRecorder()
