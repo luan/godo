@@ -39,7 +39,7 @@ func FindTask(id int) (t *Task, err error) {
 	return
 }
 
-func Tasks()([]Task) {
+func Tasks() []Task {
 	return tasks
 }
 

@@ -8,7 +8,6 @@ import (
 	"strconv"
 )
 
-
 func SetRoutes(m *martini.ClassicMartini) {
 	m.Use(render.Renderer())
 	m.Get("/tasks", func(r render.Render) {
@@ -23,19 +22,19 @@ func SetRoutes(m *martini.ClassicMartini) {
 	m.Patch("/tasks/:id", func(params martini.Params, req *http.Request, r render.Render) {
 		doPatch(params, req, r)
 	})
-  m.Post("/tasks/:id", func(params martini.Params, req *http.Request, r render.Render) {
+
+	m.Post("/tasks/:id", func(params martini.Params, req *http.Request, r render.Render) {
 		doPatch(params, req, r)
 	})
 
 }
 
 func doPatch(params martini.Params, req *http.Request, r render.Render) {
-		id, _:= strconv.Atoi(params["id"])
-		task, _ := godo.FindTask(id)
-		task.Status = req.FormValue("status")
-		r.Redirect("/tasks", 301)
+	id, _ := strconv.Atoi(params["id"])
+	task, _ := godo.FindTask(id)
+	task.Status = req.FormValue("status")
+	r.Redirect("/tasks", 301)
 }
-
 
 func main() {
 	m := martini.Classic()

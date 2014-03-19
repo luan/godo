@@ -1,12 +1,12 @@
 package main_test
 
 import (
-	"strconv"
 	"github.com/codegangsta/martini"
 	"github.com/luan/godo/godo"
 	. "github.com/luan/godo/main"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"strconv"
 )
 
 var _ = Describe("App", func() {
@@ -54,7 +54,7 @@ var _ = Describe("App", func() {
 
 		Describe("PATCH /tasks/:id", func() {
 			var (
-				anotherTask godo.Task
+				anotherTask     godo.Task
 				taskToBeUpdated godo.Task
 			)
 			BeforeEach(func() {
@@ -64,19 +64,19 @@ var _ = Describe("App", func() {
 
 			It("sets the patch route", func() {
 				Expect(m.MethodsFor("/tasks/" + strconv.Itoa(taskToBeUpdated.Id))).To(ContainElement("PATCH"))
-				Patch(m, "/tasks/" + strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "done"})
+				Patch(m, "/tasks/"+strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "done"})
 				Expect(response.Code).To(Equal(301))
 			})
 
 			It("Updates the status of the task", func() {
 				var task *godo.Task
 
-				Patch(m, "/tasks/" + strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "done"})
+				Patch(m, "/tasks/"+strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "done"})
 				Expect(len(godo.Tasks())).To(Equal(2))
 				task, _ = godo.FindTask(taskToBeUpdated.Id)
 				Expect(task.Status).To(Equal("done"))
 
-				Patch(m, "/tasks/" + strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "pending"})
+				Patch(m, "/tasks/"+strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "pending"})
 				task, _ = godo.FindTask(taskToBeUpdated.Id)
 				Expect(task.Status).To(Equal("pending"))
 			})

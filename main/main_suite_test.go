@@ -1,10 +1,10 @@
 package main_test
 
 import (
+	"bytes"
 	"github.com/codegangsta/martini"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"bytes"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"

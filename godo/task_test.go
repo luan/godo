@@ -11,9 +11,8 @@ var _ = Describe("Task", func() {
 		ResetTasks()
 	})
 
-
 	Describe("NextStatus", func() {
-		It("returns the next possible status of the task", func(){
+		It("returns the next possible status of the task", func() {
 			task := AddTask("my task")
 			task.Status = "pending"
 			Expect(task.NextStatus()).To(Equal("done"))
@@ -54,7 +53,7 @@ var _ = Describe("Task", func() {
 		It("Finds a task by its Id", func() {
 			var (
 				task *Task
-				err error
+				err  error
 			)
 
 			task, err = FindTask(1)
