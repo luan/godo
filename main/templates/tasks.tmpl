@@ -1,9 +1,24 @@
+<style>
+
+.done {
+  text-decoration : line-through
+}
+
+</style>
+
 <form name="input" action="/tasks" method="post">
   <input type="text" name="name" autofocus="autofocus"/>
   <input type="submit" value="save"/>
 </form>
+
 <ul>
   {{range .}}
-    <li>{{.Name}}</li>
+    <li class = "{{.Status}}">{{.Name}}
+      <form action="/tasks/{{.Id}}" method="post">
+        <input type="hidden" name="status" value="{{.NextStatus}}"/>
+        <input type="submit" value="set to {{.NextStatus}}"/>
+      </form>    
+    </li>
   {{end}}
 </ul>
+

@@ -39,3 +39,17 @@ func Post(m *martini.ClassicMartini, route string, params map[string]string) {
 	response = httptest.NewRecorder()
 	m.ServeHTTP(response, request)
 }
+
+func Patch(m *martini.ClassicMartini, route string, params map[string]string) {
+	body := &bytes.Buffer{}
+
+	writer := multipart.NewWriter(body)
+	for k, v := range params {
+		writer.WriteField(k, v)
+	}
+	request, _ := http.NewRequest("PATCH", route, body)
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+	writer.Close()
+	response = httptest.NewRecorder()
+	m.ServeHTTP(response, request)
+}

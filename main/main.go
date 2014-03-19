@@ -3,44 +3,42 @@ package main
 import (
 	"github.com/codegangsta/martini"
 	"github.com/codegangsta/martini-contrib/render"
-	"github.com/martini-contrib/binding"
+	"github.com/luan/godo/godo"
+	"net/http"
+	"strconv"
 )
 
 
-type App struct {
-	tasks []Task
-}
-
-type Task struct {
-	Name string `form:"name" binding:"required"`
-}
-
-func NewApp() *App {
-	return &App{[]Task{}}
-}
-
-func SetRoutes(app *App, m *martini.ClassicMartini) {
+func SetRoutes(m *martini.ClassicMartini) {
 	m.Use(render.Renderer())
 	m.Get("/tasks", func(r render.Render) {
-		r.HTML(200, "tasks", app.tasks)
+		r.HTML(200, "tasks", godo.Tasks())
 	})
 
-	m.Post("/tasks", binding.Bind(Task{}), binding.ErrorHandler, app.AddTask, func(r render.Render) {
+	m.Post("/tasks", func(req *http.Request, r render.Render) {
+		godo.AddTask(req.FormValue("name"))
 		r.Redirect("/tasks", 301)
 	})
+
+	m.Patch("/tasks/:id", func(params martini.Params, req *http.Request, r render.Render) {
+		doPatch(params, req, r)
+	})
+  m.Post("/tasks/:id", func(params martini.Params, req *http.Request, r render.Render) {
+		doPatch(params, req, r)
+	})
+
 }
 
-func (app *App) AddTask(task Task) {
-	app.tasks = append(app.tasks, task)
+func doPatch(params martini.Params, req *http.Request, r render.Render) {
+		id, _:= strconv.Atoi(params["id"])
+		task, _ := godo.FindTask(id)
+		task.Status = req.FormValue("status")
+		r.Redirect("/tasks", 301)
 }
 
-func (app *App) Tasks() []Task {
-	return app.tasks
-}
 
 func main() {
-	app := NewApp()
 	m := martini.Classic()
-	SetRoutes(app, m)
+	SetRoutes(m)
 	m.Run()
 }
