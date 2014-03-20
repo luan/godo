@@ -3,6 +3,7 @@ package main_test
 import (
 	"bytes"
 	"github.com/codegangsta/martini"
+	. "github.com/luan/godo/main"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"mime/multipart"
@@ -11,36 +12,44 @@ import (
 	"testing"
 )
 
+var (
+	response       *httptest.ResponseRecorder
+	martiniClassic *martini.ClassicMartini
+)
+
 func TestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
+	martiniClassic = martini.Classic()
+	SetRoutes(martiniClassic)
 	RunSpecs(t, "Main Suite")
 }
 
-var (
-	response *httptest.ResponseRecorder
-)
-
-func Get(m *martini.ClassicMartini, route string) {
-	request, _ := http.NewRequest("GET", route, nil)
-	response = httptest.NewRecorder()
-	m.ServeHTTP(response, request)
+func MethodsFor(path string) []string {
+	return martiniClassic.MethodsFor(path)
 }
 
-func Post(m *martini.ClassicMartini, route string, params map[string]string) {
-	body := &bytes.Buffer{}
+func Get(route string) {
+	request, _ := http.NewRequest("GET", route, nil)
+	response = httptest.NewRecorder()
+	martiniClassic.ServeHTTP(response, request)
+}
 
+func Post(route string, params map[string]string) {
+	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	for k, v := range params {
 		writer.WriteField(k, v)
 	}
+
 	request, _ := http.NewRequest("POST", route, body)
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 	writer.Close()
+
 	response = httptest.NewRecorder()
-	m.ServeHTTP(response, request)
+	martiniClassic.ServeHTTP(response, request)
 }
 
-func Patch(m *martini.ClassicMartini, route string, params map[string]string) {
+func Patch(route string, params map[string]string) {
 	body := &bytes.Buffer{}
 
 	writer := multipart.NewWriter(body)
@@ -51,5 +60,5 @@ func Patch(m *martini.ClassicMartini, route string, params map[string]string) {
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 	writer.Close()
 	response = httptest.NewRecorder()
-	m.ServeHTTP(response, request)
+	martiniClassic.ServeHTTP(response, request)
 }

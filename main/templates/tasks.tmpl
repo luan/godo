@@ -13,7 +13,7 @@
 
 <ul>
   {{range .}}
-    <li class = "{{.Status}}">{{.Name}}
+    <li class="{{.Status}}">{{.Name}}
       <form action="/tasks/{{.Id}}" method="post">
         <input type="hidden" name="status" value="{{.NextStatus}}"/>
         <input type="submit" value="set to {{.NextStatus}}"/>
