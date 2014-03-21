@@ -62,7 +62,7 @@ var _ = Describe("TasksController", func() {
 		})
 
 		It("Updates the status of the task", func() {
-			var task *godo.Task
+			var task godo.Task
 
 			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "done"})
 			Expect(len(godo.Tasks())).To(Equal(2))

@@ -2,8 +2,12 @@ package main_test
 
 import (
 	"bytes"
+	"database/sql"
 	"github.com/codegangsta/martini"
+	"github.com/coopernurse/gorp"
+	"github.com/luan/godo/godo"
 	. "github.com/luan/godo/main"
+	_ "github.com/mattn/go-sqlite3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"mime/multipart"
@@ -20,6 +24,7 @@ var (
 func TestMain(t *testing.T) {
 	RegisterFailHandler(Fail)
 	martiniClassic = martini.Classic()
+	InitDb()
 	SetRoutes(martiniClassic)
 	RunSpecs(t, "Main Suite")
 }
@@ -61,4 +66,22 @@ func Patch(route string, params map[string]string) {
 	writer.Close()
 	response = httptest.NewRecorder()
 	martiniClassic.ServeHTTP(response, request)
+}
+
+func SetUpDb() {
+	// connect to db using standard Go database/sql API
+	// use whatever database/sql driver you wish
+	db, _ := sql.Open("sqlite3", "/tmp/tasks_test.bin")
+
+	// construct a gorp DbMap
+	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.SqliteDialect{}}
+
+	// add a table, setting the table name to 'posts' and
+	// specifying that the Id property is an auto incrementing PK
+	dbmap.AddTableWithName(godo.Task{}, "tasks").SetKeys(true, "Id")
+	godo.Dbmap = dbmap
+
+	// create the table. in a production system you'd generally
+	// use a migration tool, or create the tables via scripts
+	_ = dbmap.CreateTablesIfNotExists()
 }

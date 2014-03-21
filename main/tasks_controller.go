@@ -22,6 +22,9 @@ func (c *TasksController) Create(req *http.Request, r render.Render) {
 func (c *TasksController) Update(params martini.Params, req *http.Request, r render.Render) {
 	id, _ := strconv.Atoi(params["id"])
 	task, _ := godo.FindTask(id)
+
 	task.Status = req.FormValue("status")
+	godo.UpdateTask(task)
+
 	r.Redirect("/tasks", 301)
 }
