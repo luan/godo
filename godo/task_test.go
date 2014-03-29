@@ -8,14 +8,18 @@ import (
 )
 
 var _ = Describe("Task", func() {
-	BeforeEach(func() {
-		ResetTasks()
+	var (
+		tm *TaskManager
+	)
 
+	BeforeEach(func() {
+		tm = NewTaskManager()
+		ResetDatabase()
 	})
 
 	Describe("NextStatus", func() {
 		It("returns the next possible status of the task", func() {
-			task := AddTask("my task")
+			task, _ := tm.Add("my task")
 			task.Status = "pending"
 			Expect(task.NextStatus()).To(Equal("done"))
 			task.Status = "done"
@@ -25,34 +29,38 @@ var _ = Describe("Task", func() {
 
 	Describe("AddTask", func() {
 		It("Creates and returns a Task", func() {
-			task := AddTask("my task")
+			task, _ := tm.Add("my task")
 			Expect(task.Name).To(Equal("my task"))
 			Expect(task.Status).To(Equal("pending"))
 		})
 
 		It("Sets unique identifier to each task", func() {
-			task1 := AddTask("my task")
-			task2 := AddTask("other task")
-			Expect(task1.Id).NotTo(Equal(0))
-			Expect(task2.Id).NotTo(Equal(0))
-			Expect(task1.Id).NotTo(Equal(task2.Id))
+			task1, _ := tm.Add("my task")
+			task2, _ := tm.Add("other task")
+			Expect(task1.ID).NotTo(Equal(0))
+			Expect(task2.ID).NotTo(Equal(0))
+			Expect(task1.ID).NotTo(Equal(task2.ID))
 		})
 
 		It("Adds each task to the list", func() {
-			AddTask("my task")
-			AddTask("another task")
+			tm.Add("my task")
+			tm.Add("another task")
 
-			Expect(len(Tasks())).To(Equal(2))
+			tasks, _ := tm.FindAll()
+
+			Expect(len(tasks)).To(Equal(2))
 		})
 	})
 
 	Describe("Update Tasks", func() {
 		It("updates", func() {
-			t := AddTask("my task")
+			t, _ := tm.Add("my task")
 			t.Name = "ANOTHER NAME"
-			UpdateTask(t)
-			t, _ = FindTask(t.Id)
-			Expect(t.Name).To(Equal("ANOTHER NAME"))
+			tm.Update(&t)
+
+			foundTask := Task{}
+			tm.Find(t.ID, &foundTask)
+			Expect(foundTask.Name).To(Equal("ANOTHER NAME"))
 		})
 	})
 
@@ -63,28 +71,28 @@ var _ = Describe("Task", func() {
 			task2 Task
 		)
 		BeforeEach(func() {
-			task1 = AddTask("task one")
+			task1, _ = tm.Add("task one")
 			task2 = Task{Name: "task two", Status: "pending"}
 			_ = Dbmap.Insert(&task2)
 		})
 
-		It("Finds a task by its Id", func() {
+		It("Finds a task by its ID", func() {
 			var (
 				task Task
 				err  error
 			)
 
-			task, err = FindTask(task1.Id)
+			err = tm.Find(task1.ID, &task)
 			Expect(err).To(BeNil())
 			Expect(task.Name).To(Equal("task one"))
 
-			task, err = FindTask(task2.Id)
+			err = tm.Find(task2.ID, &task)
 			Expect(err).To(BeNil())
 			Expect(task.Name).To(Equal("task two"))
 
-			task, err = FindTask(38938383)
+			err = tm.Find(38938383, &task)
 			fmt.Println(err)
-			Expect(err.Error()).To(Equal("Couldn't find task with Id: 38938383"))
+			Expect(err.Error()).To(Equal("sql: no rows in result set"))
 		})
 	})
 })

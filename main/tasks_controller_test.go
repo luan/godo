@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("TasksController", func() {
 	BeforeEach(func() {
-		godo.ResetTasks()
+		godo.ResetDatabase()
 	})
 
 	Describe("GET /tasks", func() {
@@ -20,8 +20,8 @@ var _ = Describe("TasksController", func() {
 		})
 
 		It("returns all the tasks in the list", func() {
-			godo.AddTask("do stuff")
-			godo.AddTask("do more stuff")
+			godo.NewTaskManager().Add("do stuff")
+			godo.NewTaskManager().Add("do more stuff")
 
 			Get("/tasks")
 			Expect(response.Body).To(MatchRegexp("<li class=\"pending\">\\s*do stuff\\s*"))
@@ -39,9 +39,12 @@ var _ = Describe("TasksController", func() {
 		It("sets the the tasks", func() {
 			Post("/tasks", map[string]string{"name": "foo"})
 			Post("/tasks", map[string]string{"name": "bar"})
-			Expect(len(godo.Tasks())).To(Equal(2))
-			Expect(godo.Tasks()[0].Name).To(Equal("foo"))
-			Expect(godo.Tasks()[1].Name).To(Equal("bar"))
+
+			tasks, _ := godo.NewTaskManager().FindAll()
+
+			Expect(len(tasks)).To(Equal(2))
+			Expect(tasks[0].Name).To(Equal("foo"))
+			Expect(tasks[1].Name).To(Equal("bar"))
 		})
 	})
 
@@ -51,27 +54,29 @@ var _ = Describe("TasksController", func() {
 			taskToBeUpdated godo.Task
 		)
 		BeforeEach(func() {
-			anotherTask = godo.AddTask("dont update me")
-			taskToBeUpdated = godo.AddTask("a task")
+			anotherTask, _ = godo.NewTaskManager().Add("dont update me")
+			taskToBeUpdated, _ = godo.NewTaskManager().Add("a task")
 		})
 
 		It("sets the patch route", func() {
-			Expect(MethodsFor("/tasks/" + strconv.Itoa(taskToBeUpdated.Id))).To(ContainElement("PATCH"))
-			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "done"})
+			Expect(MethodsFor("/tasks/" + strconv.Itoa(taskToBeUpdated.ID))).To(ContainElement("PATCH"))
+			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.ID), map[string]string{"status": "done"})
 			Expect(response.Code).To(Equal(301))
 		})
 
 		It("Updates the status of the task", func() {
-			var task godo.Task
+			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.ID), map[string]string{"status": "done"})
+			tasks, _ := godo.NewTaskManager().FindAll()
 
-			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "done"})
-			Expect(len(godo.Tasks())).To(Equal(2))
-			task, _ = godo.FindTask(taskToBeUpdated.Id)
+			Expect(len(tasks)).To(Equal(2))
+			task := &godo.Task{}
+			godo.NewTaskManager().Find(taskToBeUpdated.ID, task)
 			Expect(task.Status).To(Equal("done"))
 
-			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.Id), map[string]string{"status": "pending"})
-			task, _ = godo.FindTask(taskToBeUpdated.Id)
-			Expect(task.Status).To(Equal("pending"))
+			task2 := &godo.Task{}
+			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.ID), map[string]string{"status": "pending"})
+			godo.NewTaskManager().Find(taskToBeUpdated.ID, task2)
+			Expect(task2.Status).To(Equal("pending"))
 		})
 	})
 })

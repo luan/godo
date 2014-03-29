@@ -11,20 +11,23 @@ import (
 type TasksController struct{}
 
 func (c *TasksController) List(r render.Render) {
-	r.HTML(200, "tasks", godo.Tasks())
+	tasks, _ := godo.NewTaskManager().FindAll()
+	r.HTML(200, "tasks", tasks)
 }
 
 func (c *TasksController) Create(req *http.Request, r render.Render) {
-	godo.AddTask(req.FormValue("name"))
+	godo.NewTaskManager().Add(req.FormValue("name"))
 	r.Redirect("/tasks", 301)
 }
 
 func (c *TasksController) Update(params martini.Params, req *http.Request, r render.Render) {
 	id, _ := strconv.Atoi(params["id"])
-	task, _ := godo.FindTask(id)
+
+	task := &godo.Task{}
+	godo.NewTaskManager().Find(id, task)
 
 	task.Status = req.FormValue("status")
-	godo.UpdateTask(task)
+	godo.NewTaskManager().Update(task)
 
 	r.Redirect("/tasks", 301)
 }
