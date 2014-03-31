@@ -1,7 +1,6 @@
 package godo_test
 
 import (
-	"fmt"
 	. "github.com/luan/godo/godo"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -101,7 +100,6 @@ var _ = Describe("Task", func() {
 			Expect(task.Name).To(Equal("task two"))
 
 			err = tm.Find(38938383, &task)
-			fmt.Println(err)
 			Expect(err.Error()).To(Equal("sql: no rows in result set"))
 		})
 	})

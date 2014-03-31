@@ -19,8 +19,8 @@ var _ = Describe("ProjectsController", func() {
 			Expect(response.Code).To(Equal(301))
 
 			Get("/projects")
-			Expect(response.Body).To(MatchRegexp("<li>p1"))
-			Expect(response.Body).To(MatchRegexp("<li>p2"))
+			Expect(response.Body).To(MatchRegexp("<p>p1"))
+			Expect(response.Body).To(MatchRegexp("<p>p2"))
 		})
 	})
 })

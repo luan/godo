@@ -82,5 +82,18 @@ var _ = Describe("TasksController", func() {
 			godo.NewTaskManager().Find(taskToBeUpdated.ID, task2)
 			Expect(task2.Status).To(Equal("pending"))
 		})
+
+		It("Updates project of the task", func() {
+			project := godo.NewProject("p1")
+			godo.NewProjectManager().Add(&project)
+
+			Patch("/tasks/"+strconv.Itoa(taskToBeUpdated.ID), map[string]string{"project_id": strconv.Itoa(project.ID)})
+
+			proj := &godo.Project{}
+			godo.NewProjectManager().Find(project.ID, proj)
+			tasks := []godo.Task{}
+			godo.NewTaskManager().FindTasksOfProject(project.ID, &tasks)
+			Expect(tasks[0].ID).To(Equal(taskToBeUpdated.ID))
+		})
 	})
 })

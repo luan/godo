@@ -1,0 +1,27 @@
+<style>
+
+.done {
+  text-decoration : line-through
+}
+
+</style>
+
+<form name="input" action="/projects" method="post">
+  <input type="text" name="name" autofocus="autofocus"/>
+  <input type="submit" value="save"/>
+</form>
+
+<ul>
+  {{range .}}
+    <li>
+      <p>{{.Name}}</p>
+      <ul>
+        {{range .Tasks}}
+          <li>{{.Name}}</li>
+        {{end}}
+      </ul>
+    </li>
+
+  {{end}}
+</ul>
+

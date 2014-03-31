@@ -33,6 +33,8 @@ func (c *TasksController) Update(params martini.Params, req *http.Request, r ren
 
 
 	task.Status = req.FormValue("status")
+	projectID, _ := strconv.Atoi(req.FormValue("project_id"))
+	task.ProjectID = projectID
 	godo.NewTaskManager().Update(task)
 
 	r.Redirect("/tasks", 301)
