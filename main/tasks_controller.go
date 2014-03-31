@@ -6,14 +6,12 @@ import (
 	"github.com/luan/godo/godo"
 	"net/http"
 	"strconv"
-	"fmt"
 )
 
 type TasksController struct{}
 
 func (c *TasksController) List(r render.Render) {
 	tasks, _ := godo.NewTaskManager().FindAll()
-	fmt.Println(tasks)
 
 	r.HTML(200, "tasks", tasks)
 }

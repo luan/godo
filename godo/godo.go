@@ -21,6 +21,7 @@ func InitDb(dbname string) *modl.DbMap {
 	// add a table, setting the table name to 'posts' and
 	// specifying that the ID property is an auto incrementing PK
 	dbmap.AddTableWithName(Task{}, "tasks").SetKeys(true, "ID")
+	dbmap.AddTableWithName(Project{}, "projects").SetKeys(true, "ID")
 	Dbmap = dbmap
 
 	// create the table. in a production system you'd generally
