@@ -11,7 +11,6 @@ func (m *manager) Add(model interface{}) error {
 
 func (m *manager) FindAll(array interface {}, tableName string) (err error) {
 	err = Dbmap.Select(array, "select * from "+ tableName +" order by id")
-
 	return
 }
 

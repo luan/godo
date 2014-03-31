@@ -20,8 +20,10 @@ var _ = Describe("TasksController", func() {
 		})
 
 		It("returns all the tasks in the list", func() {
-			godo.NewTaskManager().Add("do stuff")
-			godo.NewTaskManager().Add("do more stuff")
+			t1 := godo.NewTask("do stuff")
+			t2 := godo.NewTask("do more stuff")
+			godo.NewTaskManager().Add(&t1)
+			godo.NewTaskManager().Add(&t2)
 
 			Get("/tasks")
 			Expect(response.Body).To(MatchRegexp("<li class=\"pending\">\\s*do stuff\\s*"))
@@ -54,8 +56,10 @@ var _ = Describe("TasksController", func() {
 			taskToBeUpdated godo.Task
 		)
 		BeforeEach(func() {
-			anotherTask, _ = godo.NewTaskManager().Add("dont update me")
-			taskToBeUpdated, _ = godo.NewTaskManager().Add("a task")
+			anotherTask = godo.NewTask("dont update me")
+			taskToBeUpdated = godo.NewTask("a task")
+			godo.NewTaskManager().Add(&anotherTask)
+			godo.NewTaskManager().Add(&taskToBeUpdated)
 		})
 
 		It("sets the patch route", func() {

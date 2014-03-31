@@ -19,7 +19,8 @@ var _ = Describe("Task", func() {
 
 	Describe("NextStatus", func() {
 		It("returns the next possible status of the task", func() {
-			task, _ := tm.Add("my task")
+			task := NewTask("my task")
+			tm.Add(&task)
 			task.Status = "pending"
 			Expect(task.NextStatus()).To(Equal("done"))
 			task.Status = "done"
@@ -27,24 +28,30 @@ var _ = Describe("Task", func() {
 		})
 	})
 
-	Describe("AddTask", func() {
+	Describe("Adding Tasks", func() {
 		It("Creates and returns a Task", func() {
-			task, _ := tm.Add("my task")
+			task := NewTask("my task")
 			Expect(task.Name).To(Equal("my task"))
 			Expect(task.Status).To(Equal("pending"))
 		})
 
 		It("Sets unique identifier to each task", func() {
-			task1, _ := tm.Add("my task")
-			task2, _ := tm.Add("other task")
+			task1 := NewTask("my task")
+			task2 := NewTask("other task")
+			tm.Add(&task1)
+			tm.Add(&task2)
+
 			Expect(task1.ID).NotTo(Equal(0))
 			Expect(task2.ID).NotTo(Equal(0))
 			Expect(task1.ID).NotTo(Equal(task2.ID))
 		})
 
 		It("Adds each task to the list", func() {
-			tm.Add("my task")
-			tm.Add("another task")
+			task1 := NewTask("my task")
+			task2 := NewTask("other task")
+			tm.Add(&task1)
+			tm.Add(&task2)
+
 
 			tasks, _ := tm.FindAll()
 
@@ -54,7 +61,8 @@ var _ = Describe("Task", func() {
 
 	Describe("Update Tasks", func() {
 		It("updates", func() {
-			t, _ := tm.Add("my task")
+			t := NewTask("my task")
+			tm.Add(&t)
 			t.Name = "ANOTHER NAME"
 			tm.Update(&t)
 
@@ -71,9 +79,11 @@ var _ = Describe("Task", func() {
 			task2 Task
 		)
 		BeforeEach(func() {
-			task1, _ = tm.Add("task one")
+			task1 = NewTask("task one")
+			tm.Add(&task1)
 			task2 = Task{Name: "task two", Status: "pending"}
 			_ = Dbmap.Insert(&task2)
+			tm.Add(&task2)
 		})
 
 		It("Finds a task by its ID", func() {

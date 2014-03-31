@@ -6,17 +6,24 @@ import (
 	"github.com/luan/godo/godo"
 	"net/http"
 	"strconv"
+	"fmt"
 )
 
 type TasksController struct{}
 
 func (c *TasksController) List(r render.Render) {
 	tasks, _ := godo.NewTaskManager().FindAll()
+	fmt.Println(tasks)
+
 	r.HTML(200, "tasks", tasks)
 }
 
 func (c *TasksController) Create(req *http.Request, r render.Render) {
-	godo.NewTaskManager().Add(req.FormValue("name"))
+
+	t := godo.NewTask(req.FormValue("name"))
+	godo.NewTaskManager().Add(&t)
+
+
 	r.Redirect("/tasks", 301)
 }
 
@@ -25,6 +32,7 @@ func (c *TasksController) Update(params martini.Params, req *http.Request, r ren
 
 	task := &godo.Task{}
 	godo.NewTaskManager().Find(id, task)
+
 
 	task.Status = req.FormValue("status")
 	godo.NewTaskManager().Update(task)

@@ -14,3 +14,7 @@ func (t *Task) NextStatus() string {
 	return "done"
 }
 
+func NewTask(name string) Task {
+	return Task{Name: name, Status: "pending"}
+}
+
